@@ -8,14 +8,17 @@ def set_options(opt):
 def configure(conf):
   conf.check_tool("compiler_cxx")
   conf.check_tool("node_addon")
+  conf.check(lib='hpdf', uselib_store='HPDF', mandatory=True)
 
 def build(bld):
-  bld.add_group("c++")
-
+  bld.env.append_value('LINKFLAGS', '-lhpdf')
   obj = bld.new_task_gen("cxx", "shlib", "node_addon")
   obj.cxxflags = [
+    "-O3",
+    "-Wall",
     "-D_FILE_OFFSET_BITS=64",
     "-D_LARGEFILE_SOURCE"
   ]
   obj.target = "haru"
-  obj.source = "src/haru.cc"
+  obj.source = bld.glob('src/*.cc')
+  obj.uselib = ['HPDF','PNG','ZLIB']
