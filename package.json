@@ -1,0 +1,13 @@
+{
+  "name": "haru",
+  "description": "Node.js bindings for libharu",
+  "version": "0.0.1",
+  "engines": {
+    "node": "0.6.x"
+  },
+  "author": "Caleb Doxsey <caleb@doxsey.net>",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test.js"
+  }
+}
