@@ -1,5 +1,6 @@
 #include "doc.h"
 #include "page.h"
+#include "font.h"
 
 using namespace Haru;
 
@@ -13,6 +14,7 @@ void Doc::Initialize(Handle<Object> target) {
 
   Local<ObjectTemplate> proto = constructor->PrototypeTemplate();
   NODE_SET_PROTOTYPE_METHOD(constructor, "addPage", AddPage);
+  NODE_SET_PROTOTYPE_METHOD(constructor, "getFont", GetFont);
   NODE_SET_PROTOTYPE_METHOD(constructor, "saveToFile", SaveToFile);
 
   target->Set(String::NewSymbol("Doc"), constructor->GetFunction());
@@ -32,6 +34,33 @@ Handle<Value> Doc::AddPage(const Arguments &args) {
   page->page = HPDF_AddPage(doc->doc);
   return scope.Close(js_page);
 }
+Handle<Value> Doc::GetFont(const Arguments &args) {
+  HandleScope scope;
+
+  if (args.Length() < 1) {
+    raise("expected at least 1 arguments");
+  }
+  if (!args[0]->IsString()) {
+    raise("expected string for argument 1");
+  }
+
+  String::Utf8Value font_name(args[0]->ToString());
+  const char* c_font_name = *font_name;
+  const char* c_encoding_name = NULL;
+  if (args.Length() > 1 && args[1]->IsString()) {
+    String::Utf8Value encoding_name(args[1]->ToString());
+    c_encoding_name = *encoding_name;
+  }
+
+  Doc* doc = ObjectWrap::Unwrap<Doc>(args.This());
+  Local<Object> js_font = Font::constructor->GetFunction()->NewInstance();
+  Font* font = ObjectWrap::Unwrap<Font>(js_font);
+  font->font = HPDF_GetFont(doc->doc, c_font_name, c_encoding_name);
+  if (HPDF_GetError(doc->doc) != HPDF_OK) {
+    return handle_error(HPDF_GetError(doc->doc));
+  }
+  return scope.Close(js_font);
+}
 Handle<Value> Doc::SaveToFile(const Arguments &args) {
   HandleScope scope;
 
@@ -40,30 +69,11 @@ Handle<Value> Doc::SaveToFile(const Arguments &args) {
     return ThrowException(Exception::TypeError(String::New("string expected")));
   }
   String::Utf8Value filename(args[0]->ToString());
-  HPDF_SaveToFile(doc->doc, *filename);
-  if (doc->hasError()) {
-    return doc->error();
-  }
-  return Boolean::New(true);
+  HPDF_STATUS status = HPDF_SaveToFile(doc->doc, *filename);
+  return handle_error(status);
 }
 Doc::Doc(): ObjectWrap() {
   doc = HPDF_New(NULL, NULL);
-}
-bool Doc::hasError() {
-  return HPDF_GetError(doc) != HPDF_OK;
-}
-Handle<Value> Doc::error() {
-  HandleScope scope;
-  Local<String> str = Integer::New(HPDF_GetError(doc))->ToString();
-  switch(HPDF_GetError(doc)) {
-  case 1:
-    str = String::New("Internal error. Data consistency was lost.");
-    break;
-  case 0x1017:
-    str = String::New("Unable to open file");
-    break;
-  }
-  return ThrowException(Exception::Error(str));
 }
 Doc::~Doc() {
   HPDF_Free(doc);

@@ -11,6 +11,7 @@ namespace Haru {
       // JS methods
       static Handle<Value> New(const Arguments &args);
       static Handle<Value> AddPage(const Arguments &args);
+      static Handle<Value> GetFont(const Arguments &args);
       static Handle<Value> SaveToFile(const Arguments &args);
 
       HPDF_Doc doc;
