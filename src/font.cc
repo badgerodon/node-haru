@@ -36,8 +36,13 @@ Handle<Value> Font::GetFontName(const Arguments &args) { HandleScope scope; rais
 Handle<Value> Font::GetUnicodeWidth(const Arguments &args) { HandleScope scope; raise("not implemented"); }
 Handle<Value> Font::GetXHeight(const Arguments &args) { HandleScope scope; raise("not implemented"); }
 Handle<Value> Font::MeasureText(const Arguments &args) { HandleScope scope; raise("not implemented"); }
-Handle<Value> Font::New(const Arguments &args) {
+Handle<Value> Font::New(const Arguments &args) {  
   HandleScope scope;
+
+  if (args.Length() > 0) {
+    raise("expected 0 arguments");
+  }  
+  
   Font* font = new Font();
   font->Wrap(args.This());
   return args.This();

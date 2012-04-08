@@ -17,13 +17,14 @@ void Page::Initialize(Handle<Object> target) {
   constructor->InstanceTemplate()->SetInternalFieldCount(1);
   constructor->SetClassName(String::NewSymbol("Page"));
 
-  Local<ObjectTemplate> proto = constructor->PrototypeTemplate();
+  //Local<ObjectTemplate> proto = constructor->PrototypeTemplate();
   NODE_SET_PROTOTYPE_METHOD(constructor, "beginText", BeginText);
   NODE_SET_PROTOTYPE_METHOD(constructor, "createDestination", CreateDestination);
   NODE_SET_PROTOTYPE_METHOD(constructor, "createLinkAnnot", CreateLinkAnnot);
   NODE_SET_PROTOTYPE_METHOD(constructor, "createTextAnnot", CreateTextAnnot);
   NODE_SET_PROTOTYPE_METHOD(constructor, "createURILinkAnnot", CreateURILinkAnnot);
   NODE_SET_PROTOTYPE_METHOD(constructor, "endText", EndText);
+  NODE_SET_PROTOTYPE_METHOD(constructor, "fill", Fill);
   NODE_SET_PROTOTYPE_METHOD(constructor, "getCharSpace", GetCharSpace);
   NODE_SET_PROTOTYPE_METHOD(constructor, "getCMYKFill", GetCMYKFill);
   NODE_SET_PROTOTYPE_METHOD(constructor, "getCMYKStroke", GetCMYKStroke);
@@ -56,13 +57,17 @@ void Page::Initialize(Handle<Object> target) {
   NODE_SET_PROTOTYPE_METHOD(constructor, "getWordSpace", GetWordSpace);
   NODE_SET_PROTOTYPE_METHOD(constructor, "measureText", MeasureText);
   NODE_SET_PROTOTYPE_METHOD(constructor, "moveTextPos", MoveTextPos);
+  NODE_SET_PROTOTYPE_METHOD(constructor, "rectangle", Rectangle);
   NODE_SET_PROTOTYPE_METHOD(constructor, "setFontAndSize", SetFontAndSize);
   NODE_SET_PROTOTYPE_METHOD(constructor, "setHeight", SetHeight);
   NODE_SET_PROTOTYPE_METHOD(constructor, "setRotate", SetRotate);
+  NODE_SET_PROTOTYPE_METHOD(constructor, "setRGBFill", SetRGBFill);
+  NODE_SET_PROTOTYPE_METHOD(constructor, "setRGBStroke", SetRGBStroke);
   NODE_SET_PROTOTYPE_METHOD(constructor, "setSize", SetSize);
   NODE_SET_PROTOTYPE_METHOD(constructor, "setSlideShow", SetSlideShow);
   NODE_SET_PROTOTYPE_METHOD(constructor, "setWidth", SetWidth);
   NODE_SET_PROTOTYPE_METHOD(constructor, "showText", ShowText);
+  NODE_SET_PROTOTYPE_METHOD(constructor, "stroke", Stroke);
   NODE_SET_PROTOTYPE_METHOD(constructor, "textRect", TextRect);
   NODE_SET_PROTOTYPE_METHOD(constructor, "textWidth", TextWidth);
 
@@ -87,6 +92,18 @@ Handle<Value> Page::EndText(const Arguments &args) {
   Page* page = ObjectWrap::Unwrap<Page>(args.This());
   return handle_error(
     HPDF_Page_EndText(page->page)
+  );
+}
+Handle<Value> Page::Fill(const Arguments &args) {
+  HandleScope scope;
+
+  if (args.Length() > 0) {
+    raise("expected 0 arguments");
+  }
+  
+  Page* page = ObjectWrap::Unwrap<Page>(args.This());
+  return handle_error(
+    HPDF_Page_Fill(page->page)
   );
 }
 Handle<Value> Page::GetCharSpace(const Arguments &args) { HandleScope scope; raise("not implemented"); }
@@ -156,14 +173,42 @@ Handle<Value> Page::New(const Arguments &args) {
   page->Wrap(args.This());
   return args.This();
 }
+Handle<Value> Page::Rectangle(const Arguments &args) {  
+  HandleScope scope;
+
+  if (args.Length() != 4) {
+    raise("expected 4 arguments");
+  }
+  if (!args[0]->IsNumber()) {
+    raise("expected number for argument 1");
+  }
+  if (!args[1]->IsNumber()) {
+    raise("expected number for argument 2");
+  }
+  if (!args[2]->IsNumber()) {
+    raise("expected number for argument 3");
+  }
+  if (!args[3]->IsNumber()) {
+    raise("expected number for argument 4");
+  }
+  
+  Page* page = ObjectWrap::Unwrap<Page>(args.This());
+  HPDF_REAL x = args[0]->NumberValue();
+  HPDF_REAL y = args[1]->NumberValue();
+  HPDF_REAL width = args[2]->NumberValue();
+  HPDF_REAL height = args[3]->NumberValue();
+  
+  return handle_error(
+    HPDF_Page_Rectangle(page->page, x, y, width, height)
+  );
+}
 Handle<Value> Page::SetFontAndSize(const Arguments &args) {
   HandleScope scope;
 
   if (args.Length() != 2) {
     raise("expected 2 arguments");
   }
-  Local<Object> obj = args[0]->ToObject();
-  if (!Font::constructor->HasInstance(obj)) {
+  if (!args[0]->IsObject() || !Font::constructor->HasInstance(args[0]->ToObject())) {
     raise("expected Font for argument 1");
   }
   if (!args[1]->IsNumber()) {
@@ -171,7 +216,7 @@ Handle<Value> Page::SetFontAndSize(const Arguments &args) {
   }
 
   HPDF_Page page = ObjectWrap::Unwrap<Page>(args.This())->page;
-  HPDF_Font font = ObjectWrap::Unwrap<Font>(obj)->font;
+  HPDF_Font font = ObjectWrap::Unwrap<Font>(args[0]->ToObject())->font;
   HPDF_REAL size = args[1]->NumberValue();
 
   return handle_error(
@@ -196,16 +241,66 @@ Handle<Value> Page::SetHeight(const Arguments &args) {
   );
 }
 Handle<Value> Page::SetRotate(const Arguments &args) { HandleScope scope; raise("not implemented"); }
+Handle<Value> Page::SetRGBFill(const Arguments &args) {
+  HandleScope scope;
+  
+  if (args.Length() != 3) {
+    raise("expected 3 arguments");
+  }
+  if (!args[0]->IsNumber()) {
+    raise("expected number for argument 1");
+  }
+  if (!args[1]->IsNumber()) {
+    raise("expected number for argument 2");
+  }
+  if (!args[2]->IsNumber()) {
+    raise("expected number for argument 3");
+  }
+  
+  HPDF_Page page = ObjectWrap::Unwrap<Page>(args.This())->page;
+  HPDF_REAL r = args[0]->NumberValue();
+  HPDF_REAL g = args[1]->NumberValue();
+  HPDF_REAL b = args[2]->NumberValue();
+  
+  return handle_error(
+    HPDF_Page_SetRGBFill(page, r, g, b)
+  );
+}
+Handle<Value> Page::SetRGBStroke(const Arguments &args) {
+  HandleScope scope;
+  
+  if (args.Length() != 3) {
+    raise("expected 3 arguments");
+  }
+  if (!args[0]->IsNumber()) {
+    raise("expected number for argument 1");
+  }
+  if (!args[1]->IsNumber()) {
+    raise("expected number for argument 2");
+  }
+  if (!args[2]->IsNumber()) {
+    raise("expected number for argument 3");
+  }
+  
+  HPDF_Page page = ObjectWrap::Unwrap<Page>(args.This())->page;
+  HPDF_REAL r = args[0]->NumberValue();
+  HPDF_REAL g = args[1]->NumberValue();
+  HPDF_REAL b = args[2]->NumberValue();
+  
+  return handle_error(
+    HPDF_Page_SetRGBStroke(page, r, g, b)
+  );
+}
 Handle<Value> Page::SetSize(const Arguments &args) {
   HandleScope scope;
 
   if (args.Length() != 2) {
     raise("expected 2 arguments");
   }
-  if (!PageSizes::constructor->HasInstance(args[0]->ToObject())) {
+  if (!args[0]->IsObject() || !PageSizes::constructor->HasInstance(args[0]->ToObject())) {
     raise("expected PageSizes for argument 1");
   }
-  if (!PageDirection::constructor->HasInstance(args[1]->ToObject())) {
+  if (!args[1]->IsObject() || !PageDirection::constructor->HasInstance(args[1]->ToObject())) {
     raise("expected PageDirection for argument 2");
   }
 
@@ -251,6 +346,18 @@ Handle<Value> Page::ShowText(const Arguments &args) {
     HPDF_Page_ShowText(page->page, *text)
   );
 }
+Handle<Value> Page::Stroke(const Arguments &args) {
+  HandleScope scope;
+
+  if (args.Length() > 0) {
+    raise("expected 0 arguments");
+  }
+  
+  Page* page = ObjectWrap::Unwrap<Page>(args.This());
+  return handle_error(
+    HPDF_Page_Stroke(page->page)
+  );
+}
 Handle<Value> Page::TextRect(const Arguments &args) {
   HandleScope scope;
 
@@ -272,7 +379,7 @@ Handle<Value> Page::TextRect(const Arguments &args) {
   if (!args[4]->IsString()) {
     raise("expected string for argument 5");
   }
-  if (!TextAlignment::constructor->HasInstance(args[5]->ToObject())) {
+  if (!args[5]->IsObject() || !TextAlignment::constructor->HasInstance(args[5]->ToObject())) {
     raise("expected TextAlignment for argument 6");
   }
 
