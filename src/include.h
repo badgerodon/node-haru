@@ -3,7 +3,7 @@
 #include <node_buffer.h>
 #include <node_object_wrap.h>
 #include <node_version.h>
-#include "../include/hpdf.h"
+#include <hpdf.h>
 #include <map>
 
 using namespace v8;

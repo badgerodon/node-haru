@@ -11,7 +11,7 @@ void TextAlignment::Initialize(Handle<Object> target) {
   constructor->InstanceTemplate()->SetInternalFieldCount(1);
   constructor->SetClassName(String::NewSymbol("TextAlignment"));
 
-  Local<ObjectTemplate> proto = constructor->PrototypeTemplate();
+  //Local<ObjectTemplate> proto = constructor->PrototypeTemplate();
 
   target->Set(String::NewSymbol("TextAlignment"), constructor->GetFunction());
 
@@ -32,7 +32,7 @@ void TextAlignment::Initialize(Handle<Object> target) {
 
   Local<Object> js_justify = constructor->GetFunction()->NewInstance();
   TextAlignment* justify = ObjectWrap::Unwrap<TextAlignment>(js_justify);
-  center->text_alignment = HPDF_TALIGN_JUSTIFY;
+  justify->text_alignment = HPDF_TALIGN_JUSTIFY;
   target->Set(String::NewSymbol("TALIGN_JUSTIFY"), js_justify);
 }
 Handle<Value> TextAlignment::New(const Arguments &args) {

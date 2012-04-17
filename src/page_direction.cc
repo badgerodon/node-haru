@@ -13,7 +13,7 @@ void PageDirection::Initialize(Handle<Object> target) {
   constructor->InstanceTemplate()->SetInternalFieldCount(1);
   constructor->SetClassName(String::NewSymbol("PageDirection"));
 
-  Local<ObjectTemplate> proto = constructor->PrototypeTemplate();
+  //Local<ObjectTemplate> proto = constructor->PrototypeTemplate();
 
   target->Set(String::NewSymbol("PageDirection"), constructor->GetFunction());
 

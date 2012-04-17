@@ -14,7 +14,8 @@ void Font::Initialize(Handle<Object> target) {
   constructor->InstanceTemplate()->SetInternalFieldCount(1);
   constructor->SetClassName(String::NewSymbol("Font"));
 
-  Local<ObjectTemplate> proto = constructor->PrototypeTemplate();
+  //Local<ObjectTemplate> proto = constructor->PrototypeTemplate();
+  
   NODE_SET_PROTOTYPE_METHOD(constructor, "getAscent", GetAscent);
   NODE_SET_PROTOTYPE_METHOD(constructor, "getBBox", GetBBox);
   NODE_SET_PROTOTYPE_METHOD(constructor, "getCapHeight", GetCapHeight);

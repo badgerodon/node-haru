@@ -19,7 +19,8 @@ void Doc::Initialize(Handle<Object> target) {
   constructor->InstanceTemplate()->SetInternalFieldCount(1);
   constructor->SetClassName(String::NewSymbol("Doc"));
 
-  Local<ObjectTemplate> proto = constructor->PrototypeTemplate();
+  //Local<ObjectTemplate> proto = constructor->PrototypeTemplate();
+	
   NODE_SET_PROTOTYPE_METHOD(constructor, "addPage", AddPage);
   NODE_SET_PROTOTYPE_METHOD(constructor, "getFont", GetFont);
   NODE_SET_PROTOTYPE_METHOD(constructor, "loadTTFontFromFile", LoadTTFontFromFile);

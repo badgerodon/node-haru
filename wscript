@@ -9,11 +9,11 @@ def configure(conf):
   conf.check_tool("compiler_cxx")
   conf.check_tool("node_addon")
 
-def build(bld):  
+def build(bld):
+  bld.env.append_value('LINKFLAGS', ['-L../lib', '-lhpdf'])
   obj = bld.new_task_gen("cxx", "shlib", "node_addon")
   obj.cxxflags = [
-    "-L../include",
-    "-lhpdf",
+    "-I../include",
     "-O3",
     "-Wall",
     "-D_FILE_OFFSET_BITS=64",
@@ -21,4 +21,3 @@ def build(bld):
   ]
   obj.target = "haru"
   obj.source = bld.glob('src/*.cc')
-  obj.uselib = ['PNG','ZLIB']
