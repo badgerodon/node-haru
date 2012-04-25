@@ -55,8 +55,10 @@ void Page::Initialize(Handle<Object> target) {
   NODE_SET_PROTOTYPE_METHOD(constructor, "getTransMatrix", GetTransMatrix);
   NODE_SET_PROTOTYPE_METHOD(constructor, "getWidth", GetWidth);
   NODE_SET_PROTOTYPE_METHOD(constructor, "getWordSpace", GetWordSpace);
+  NODE_SET_PROTOTYPE_METHOD(constructor, "lineTo", LineTo);
   NODE_SET_PROTOTYPE_METHOD(constructor, "measureText", MeasureText);
   NODE_SET_PROTOTYPE_METHOD(constructor, "moveTextPos", MoveTextPos);
+  NODE_SET_PROTOTYPE_METHOD(constructor, "moveTo", MoveTo);
   NODE_SET_PROTOTYPE_METHOD(constructor, "rectangle", Rectangle);
   NODE_SET_PROTOTYPE_METHOD(constructor, "setFontAndSize", SetFontAndSize);
   NODE_SET_PROTOTYPE_METHOD(constructor, "setHeight", SetHeight);
@@ -148,6 +150,24 @@ Handle<Value> Page::GetWidth(const Arguments &args) {
   return scope.Close(Number::New(width));
 }
 Handle<Value> Page::GetWordSpace(const Arguments &args) { HandleScope scope; raise("not implemented"); }
+Handle<Value> Page::LineTo(const Arguments &args) {
+  HandleScope scope;
+
+  if (args.Length() != 2) {
+    return ThrowException(Exception::TypeError(String::New("expected two arguments")));
+  }
+  if (!args[0]->IsNumber() || !args[1]->IsNumber()) {
+    return ThrowException(Exception::TypeError(String::New("expected two numbers")));
+  }
+
+  HPDF_REAL x = args[0]->NumberValue();
+  HPDF_REAL y = args[1]->NumberValue();
+
+  Page* page = ObjectWrap::Unwrap<Page>(args.This());
+  return handle_error(
+    HPDF_Page_LineTo(page->page, x, y)
+  );
+}
 Handle<Value> Page::MeasureText(const Arguments &args) { HandleScope scope; raise("not implemented"); }
 Handle<Value> Page::MoveTextPos(const Arguments &args) {
   HandleScope scope;
@@ -165,6 +185,24 @@ Handle<Value> Page::MoveTextPos(const Arguments &args) {
   Page* page = ObjectWrap::Unwrap<Page>(args.This());
   return handle_error(
     HPDF_Page_MoveTextPos(page->page, x, y)
+  );
+}
+Handle<Value> Page::MoveTo(const Arguments &args) {
+  HandleScope scope;
+
+  if (args.Length() != 2) {
+    return ThrowException(Exception::TypeError(String::New("expected two arguments")));
+  }
+  if (!args[0]->IsNumber() || !args[1]->IsNumber()) {
+    return ThrowException(Exception::TypeError(String::New("expected two numbers")));
+  }
+
+  HPDF_REAL x = args[0]->NumberValue();
+  HPDF_REAL y = args[1]->NumberValue();
+
+  Page* page = ObjectWrap::Unwrap<Page>(args.This());
+  return handle_error(
+    HPDF_Page_MoveTo(page->page, x, y)
   );
 }
 Handle<Value> Page::New(const Arguments &args) {
