@@ -1,7 +1,7 @@
 {
   "name": "haru",
   "description": "Node.js bindings for libharu",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "engines": {
     "node": "0.6.x"
   },
