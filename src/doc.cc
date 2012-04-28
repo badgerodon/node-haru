@@ -36,6 +36,9 @@ Handle<Value> Doc::AddPage(const Arguments &args) {
   Local<Object> js_page = Page::constructor->GetFunction()->NewInstance();
   Page* page = ObjectWrap::Unwrap<Page>(js_page);
   page->page = HPDF_AddPage(doc->doc);
+	if (HPDF_GetError(doc->doc) != HPDF_OK) {
+    return handle_error(HPDF_GetError(doc->doc));
+  }
   return scope.Close(js_page);
 }
 Handle<Value> Doc::GetFont(const Arguments &args) {

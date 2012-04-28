@@ -2,45 +2,32 @@
 
 using namespace Haru;
 
-PageSizes::PageSizes(): ObjectWrap() {}
-PageSizes::~PageSizes() {}
-
-Persistent<FunctionTemplate> PageSizes::constructor;
-void PageSizes::Initialize(Handle<Object> target) {
-  HandleScope scope;
-
-  constructor = Persistent<FunctionTemplate>::New(FunctionTemplate::New(PageSizes::New));
-  constructor->InstanceTemplate()->SetInternalFieldCount(1);
-  constructor->SetClassName(String::NewSymbol("PageSizes"));
-
-  //Local<ObjectTemplate> proto = constructor->PrototypeTemplate();
-
-  target->Set(String::NewSymbol("PageSizes"), constructor->GetFunction());
-
-  map<const char*, HPDF_PageSizes> m;
-  m["PAGE_SIZE_LETTER"] = HPDF_PAGE_SIZE_LETTER;
-  m["PAGE_SIZE_LEGAL"] = HPDF_PAGE_SIZE_LEGAL;
-  m["PAGE_SIZE_A3"] = HPDF_PAGE_SIZE_A3;
-  m["PAGE_SIZE_A4"] = HPDF_PAGE_SIZE_A4;
-  m["PAGE_SIZE_A5"] = HPDF_PAGE_SIZE_A5;
-  m["PAGE_SIZE_B4"] = HPDF_PAGE_SIZE_B4;
-  m["PAGE_SIZE_B5"] = HPDF_PAGE_SIZE_B5;
-  m["PAGE_SIZE_EXECUTIVE"] = HPDF_PAGE_SIZE_EXECUTIVE;
-  m["PAGE_SIZE_US4x6"] = HPDF_PAGE_SIZE_US4x6;
-  m["PAGE_SIZE_US4x8"] = HPDF_PAGE_SIZE_US4x8;
-  m["PAGE_SIZE_US5x7"] = HPDF_PAGE_SIZE_US5x7;
-  m["PAGE_SIZE_COMM10"] = HPDF_PAGE_SIZE_COMM10;
-
-  for (map<const char*, HPDF_PageSizes>::iterator ii=m.begin(); ii != m.end(); ++ii) {
-    Local<Object> js = constructor->GetFunction()->NewInstance();
-    PageSizes* obj = ObjectWrap::Unwrap<PageSizes>(js);
-    obj->page_sizes = (*ii).second;
-    target->Set(String::NewSymbol((*ii).first), js);
+HPDF_PageSizes PageSizes::Get(const char* name) {  
+  if (strcmp(name, "letter") == 0) {
+    return HPDF_PAGE_SIZE_LETTER;
+  } else if (strcmp(name, "legal") == 0) {
+    return HPDF_PAGE_SIZE_LEGAL;
+  } else if (strcmp(name, "a3") == 0) {
+    return HPDF_PAGE_SIZE_A3;
+  } else if (strcmp(name, "a4") == 0) {
+    return HPDF_PAGE_SIZE_A4;
+  } else if (strcmp(name, "a5") == 0) {
+    return HPDF_PAGE_SIZE_A5;
+  } else if (strcmp(name, "b4") == 0) {
+    return HPDF_PAGE_SIZE_B4;
+  } else if (strcmp(name, "b5") == 0) {
+    return HPDF_PAGE_SIZE_B5;
+  } else if (strcmp(name, "executive") == 0) {
+    return HPDF_PAGE_SIZE_EXECUTIVE;
+  } else if (strcmp(name, "us4x6") == 0) {
+    return HPDF_PAGE_SIZE_US4x6;
+  } else if (strcmp(name, "us4x8") == 0) {
+    return HPDF_PAGE_SIZE_US4x8;
+  } else if (strcmp(name, "us5x7") == 0) {
+    return HPDF_PAGE_SIZE_US5x7;
+  } else if (strcmp(name, "comm10") == 0) {
+    return HPDF_PAGE_SIZE_COMM10;
   }
-}
-Handle<Value> PageSizes::New(const Arguments &args) {
-  HandleScope scope;
-  PageSizes* page_sizes = new PageSizes();
-  page_sizes->Wrap(args.This());
-  return args.This();
+  
+  return HPDF_PAGE_SIZE_LETTER;
 }

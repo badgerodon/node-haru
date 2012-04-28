@@ -4,18 +4,9 @@
 #include "include.h"
 
 namespace Haru {
-  class PageSizes: public node::ObjectWrap {
+  class PageSizes {
     public:
-      static Persistent<FunctionTemplate> constructor;
-      static void Initialize(Handle<Object> target);
-      // JS methods
-      static Handle<Value> New(const Arguments &args);
-
-      HPDF_PageSizes page_sizes;
-
-      PageSizes();
-    private:
-      ~PageSizes();
+      static HPDF_PageSizes Get(const char*);
   };
 }
 

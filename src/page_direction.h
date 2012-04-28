@@ -4,18 +4,9 @@
 #include "include.h"
 
 namespace Haru {
-  class PageDirection: public node::ObjectWrap {
+  class PageDirection {
     public:
-      static Persistent<FunctionTemplate> constructor;
-      static void Initialize(Handle<Object> target);
-      // JS methods
-      static Handle<Value> New(const Arguments &args);
-
-      HPDF_PageDirection page_direction;
-
-      PageDirection();
-    private:
-      ~PageDirection();
+      static HPDF_PageDirection Get(const char*);
   };
 }
 

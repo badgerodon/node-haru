@@ -454,6 +454,4 @@ extern "C" void init(Handle<Object> target) {
   Page::Initialize(target);
   Font::Initialize(target);
   TextAlignment::Initialize(target);
-  PageSizes::Initialize(target);
-  PageDirection::Initialize(target);
 }

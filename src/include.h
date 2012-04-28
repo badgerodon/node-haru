@@ -5,6 +5,7 @@
 #include <node_version.h>
 #include <hpdf.h>
 #include <map>
+#include <string.h>
 
 using namespace v8;
 using namespace node;

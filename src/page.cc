@@ -335,16 +335,19 @@ Handle<Value> Page::SetSize(const Arguments &args) {
   if (args.Length() != 2) {
     raise("expected 2 arguments");
   }
-  if (!args[0]->IsObject() || !PageSizes::constructor->HasInstance(args[0]->ToObject())) {
-    raise("expected PageSizes for argument 1");
+  if (!args[0]->IsString()) {
+    raise("expected string for argument 1");
   }
-  if (!args[1]->IsObject() || !PageDirection::constructor->HasInstance(args[1]->ToObject())) {
-    raise("expected PageDirection for argument 2");
+  if (!args[1]->IsString()) {
+    raise("expected string for argument 2");
   }
+  
+  String::Utf8Value size_str(args[0]->ToString());
+  String::Utf8Value direction_str(args[1]->ToString());
 
   HPDF_Page page = ObjectWrap::Unwrap<Page>(args.This())->page;
-  HPDF_PageSizes size = ObjectWrap::Unwrap<PageSizes>(args.This())->page_sizes;
-  HPDF_PageDirection direction = ObjectWrap::Unwrap<PageDirection>(args.This())->page_direction;
+  HPDF_PageSizes size = PageSizes::Get(*size_str);
+  HPDF_PageDirection direction = PageDirection::Get(*direction_str);
 
   return handle_error(
     HPDF_Page_SetSize(page, size, direction)
@@ -433,4 +436,19 @@ Handle<Value> Page::TextRect(const Arguments &args) {
     HPDF_Page_TextRect(page, left, top, right, bottom, *text, align, NULL)
   );
 }
-Handle<Value> Page::TextWidth(const Arguments &args) { HandleScope scope; raise("not implemented"); }
+Handle<Value> Page::TextWidth(const Arguments &args) {
+  HandleScope scope;
+  
+  if (args.Length() != 1) {
+    raise("expected 1 argument");
+  }
+  if (!args[0]->IsString()) {
+    raise("expected string for argument 1");
+  } 
+
+  HPDF_Page page = ObjectWrap::Unwrap<Page>(args.This())->page;
+  String::Utf8Value text(args[0]->ToString());
+
+  double w = HPDF_Page_TextWidth(page, *text);
+  return scope.Close(Number::New(w));
+}
