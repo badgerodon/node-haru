@@ -447,7 +447,7 @@ Handle<Value> Haru::handle_error(HPDF_STATUS status) {
   return ThrowException(Exception::Error(str));
 }
 
-extern "C" void init(Handle<Object> target) {
+void init(Handle<Object> target) {
   HandleScope scope;
 
   Doc::Initialize(target);
@@ -455,3 +455,5 @@ extern "C" void init(Handle<Object> target) {
   Font::Initialize(target);
   TextAlignment::Initialize(target);
 }
+
+NODE_MODULE(haru, init)

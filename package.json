@@ -1,17 +1,14 @@
 {
   "author": "Caleb Doxsey <caleb@doxsey.net>",
   "description": "Bindings for libharu",
-  "engines": {
-    "node": "0.6.x"
-  },
   "main": "index.js",
   "name": "haru",
   "repository": {
-	"type": "git",
-	"url": "git://github.com/badgerodon/node-haru.git"
+  	"type": "git",
+  	"url": "git://github.com/badgerodon/node-haru.git"
   },
   "scripts": {
     "test": "node test.js"
   },
-  "version": "0.0.6"
+  "version": "0.0.7"
 }
